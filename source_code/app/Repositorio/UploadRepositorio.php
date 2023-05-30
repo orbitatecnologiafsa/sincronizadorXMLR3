@@ -25,6 +25,10 @@ class UploadRepositorio
             $nomepasta = ($this->pastasNomeGenerate());
             $access_token = $this->autenticar();
 
+            if(!File::exists(storage_path($this->diretorio))){
+                File::makeDirectory(storage_path($this->diretorio),0755);
+            }
+
             $cnpj = $this->getCNPJ();
             if (empty($cnpj)) {
                 var_dump(['error' => 'cnpj não encontrado']);
@@ -40,7 +44,6 @@ class UploadRepositorio
                 if (File::exists($diretorio)) {
                     // Obtém a lista de arquivos no diretório
                     $arquivos = collect(File::files($diretorio));
-
 
                     //  $chunk = array_chunk($arquivos,100,true);
                     //  var_dump(count($arquivos) == 0);die();
