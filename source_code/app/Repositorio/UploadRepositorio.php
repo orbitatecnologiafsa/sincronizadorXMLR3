@@ -17,7 +17,7 @@ class UploadRepositorio
     protected $url = "http://127.0.0.1:8000/api/";
     protected $certificado = "app/cacert.pem";
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
-    protected $diretorio = "app/xml";
+    protected $diretorio = "/home/pingo/Documentos/Projetos/versao-ob/sincronizadorXMLR3/source_code/storage/app/xml";
 
     public function envairXML()
     {
@@ -25,9 +25,9 @@ class UploadRepositorio
             $nomepasta = ($this->pastasNomeGenerate());
             $access_token = $this->autenticar();
 
-            if(!File::exists(storage_path($this->diretorio))){
-                File::makeDirectory(storage_path($this->diretorio),0755);
-            }
+            // if(!File::exists(storage_path($this->diretorio))){
+            //     File::makeDirectory(storage_path($this->diretorio),0755);
+            // }
 
             $cnpj = $this->getCNPJ();
             if (empty($cnpj)) {
@@ -40,7 +40,7 @@ class UploadRepositorio
             foreach ($nomepasta as $key => $value) {
                 echo $value . "\n";
                 // Diretório onde estão os arquivos a serem enviados
-                $diretorio = storage_path($this->diretorio . '/' . $value);
+                $diretorio = ($this->diretorio . '/' . $value);
                 if (File::exists($diretorio)) {
                     // Obtém a lista de arquivos no diretório
                     $arquivos = collect(File::files($diretorio));
@@ -49,7 +49,7 @@ class UploadRepositorio
                     //  var_dump(count($arquivos) == 0);die();
                     if (count($arquivos) > 0) {
 
-                        $chunkFiles = $arquivos->chunk(1000);
+                        $chunkFiles = $arquivos->chunk(6);
                         // Cria um array para armazenar os arquivos
                         $arquivosData = [];
                         foreach ($chunkFiles as $chunk) {
@@ -99,6 +99,8 @@ class UploadRepositorio
 
         }
     }
+
+
 
 
 
