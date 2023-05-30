@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\File;
 
 class UploadRepositorio
 {
-    protected $url = "http://127.0.0.1:8000/api/";
+    protected $url = "https://orbitaxml.azurewebsites.net/api/";
     protected $certificado = "app/cacert.pem";
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
     protected $diretorio = "/home/pingo/Documentos/XML mar 23/Core3/C3 Núcleo/nfe/NFCe";
@@ -66,7 +66,7 @@ class UploadRepositorio
                             ]);
 
                             // Faça a solicitação para a API enviando todos os arquivos de uma vez
-                            $response = $cliente->post($this->url . 'uploadxml', [
+                            $response = $cliente->post($this->url . "uploadxml/$value/$cnpj", [
                                 'headers' => [
                                     'Authorization' => "Bearer $access_token",
                                     'cnpj_cliente' => $cnpj,
