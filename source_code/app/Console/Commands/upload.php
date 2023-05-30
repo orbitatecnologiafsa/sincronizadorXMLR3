@@ -28,8 +28,14 @@ class upload extends Command
      */
     public function handle()
     {
+        date_default_timezone_set('America/Sao_Paulo');
+
+        $hora_init = date('H:i:s');
         $upload  = new ModelsUpload();
         $upload->cadastarXML();
+        $hora_final =  date('H:i:s');
+        echo "Serviço  finalizado! \n time init {$hora_init}  time final {$hora_final} \n";
+
     }
 
 

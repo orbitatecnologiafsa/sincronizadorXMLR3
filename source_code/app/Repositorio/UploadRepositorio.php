@@ -17,7 +17,7 @@ class UploadRepositorio
     protected $url = "http://127.0.0.1:8000/api/";
     protected $certificado = "app/cacert.pem";
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
-    protected $diretorio = "/home/pingo/Documentos/Projetos/versao-ob/sincronizadorXMLR3/source_code/storage/app/xml";
+    protected $diretorio = "/home/pingo/Documentos/XML mar 23/Core3/C3 Núcleo/nfe/NFCe";
 
     public function envairXML()
     {
@@ -49,7 +49,7 @@ class UploadRepositorio
                     //  var_dump(count($arquivos) == 0);die();
                     if (count($arquivos) > 0) {
 
-                        $chunkFiles = $arquivos->chunk(6);
+                        $chunkFiles = $arquivos->chunk(1000);
                         // Cria um array para armazenar os arquivos
                         $arquivosData = [];
                         foreach ($chunkFiles as $chunk) {
@@ -166,8 +166,6 @@ class UploadRepositorio
     {
         try {
             $this->getCNPJ();
-            date_default_timezone_set('America/Sao_Paulo');
-            $hora_init = date('H:i:s');
 
 
             //autenticador da api
@@ -182,8 +180,7 @@ class UploadRepositorio
             ]);
             $responseData = json_decode($response->getBody(), true);
             $access_token = $responseData['access_token'];
-            $hora_final =  date('H:i:s');
-            echo "Serviço autenticar finalizado! \n time init {$hora_init}  time final {$hora_final} \n";
+
             if (!empty($access_token)) {
                 return $access_token;
             } else {
