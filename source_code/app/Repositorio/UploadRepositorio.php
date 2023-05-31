@@ -35,8 +35,6 @@ class UploadRepositorio
                 die();
             }
 
-
-
             foreach ($nomepasta as $key => $value) {
                 echo $value . "\n";
                 // Diretório onde estão os arquivos a serem enviados
