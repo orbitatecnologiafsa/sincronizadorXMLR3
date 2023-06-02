@@ -25,7 +25,7 @@ class UploadRepositorio
     //protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe//NFCe";
     protected $dirSaveZip = 'C:\\Orbita\\sincZipXML';
     protected $diretorio = "C:\\Orbita\\R3 Núcleo\\nfe";
-    //  protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe/NFCe";
+     // protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe/NFCe";
     public function envairXML()
     {
         try {
@@ -79,7 +79,7 @@ class UploadRepositorio
 
                     // Faça o que desejar com a resposta da API
                     // ...
-                    // File::delete($dirZip);
+                     File::delete($dirZip);
                     // Retorne uma resposta adequada para o cliente
                     var_dump(['message' => 'Arquivos enviados com sucesso', "resposta" => $responseData], 200);
                 }
