@@ -21,6 +21,9 @@ class Upload extends Model
         $this->repositorio->envairXML();
     }
 
+    public function gerarZipRelatorio(){
+        $this->repositorio->gerarZipComRelatorio();
+    }
 
 }
 

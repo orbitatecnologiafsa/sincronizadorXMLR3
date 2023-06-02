@@ -1,0 +1,34 @@
+use GuzzleHttp\Client;
+
+Route::post('/enviar-arquivo-zipado', function () {
+    // Caminho do arquivo zipado que você deseja enviar
+    $arquivoZipado = '/caminho/do/arquivo.zip';
+
+    // Criação de uma instância do cliente GuzzleHTTP
+    $client = new Client();
+
+    try {
+        // Fazendo uma requisição POST para a API com o arquivo zipado
+        $response = $client->request('POST', 'http://exemplo.com/api/receber-arquivo', [
+            'multipart' => [
+                [
+                    'name'     => 'arquivo',
+                    'contents' => fopen($arquivoZipado, 'r'),
+                    'filename' => 'arquivo.zip'
+                ],
+            ]
+        ]);
+
+        // Verifica o código de status da resposta
+        if ($response->getStatusCode() === 200) {
+            // Lógica adicional em caso de sucesso
+            return 'Arquivo enviado com sucesso para a API.';
+        } else {
+            // Lógica adicional em caso de erro
+            return 'Erro ao enviar o arquivo para a API.';
+        }
+    } catch (Exception $e) {
+        // Lógica para tratar exceções
+        return 'Erro: ' . $e->getMessage();
+    }
+});
