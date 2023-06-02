@@ -77,7 +77,7 @@ class UploadRepositorio
 
                     // Faça o que desejar com a resposta da API
                     // ...
-                    File::delete($dirZip);
+                     File::delete($dirZip);
                     // Retorne uma resposta adequada para o cliente
                     var_dump(['message' => 'Arquivos enviados com sucesso', "resposta" => $responseData], 200);
                 }
@@ -280,14 +280,19 @@ class UploadRepositorio
             if ($xmlFile->getExtension() != 'pdf') {
                 $xmlContent = file_get_contents($xmlFile->getPathname());
                 $xml =  (array) simplexml_load_string($xmlContent, 'SimpleXMLElement', LIBXML_NOCDATA);
+
                 foreach ($xml as $key => $v) {
                     $ar = (array) $v;
+
                     echo "lendo arq. pasta $pasta\n";
+
                     if (isset($ar['infProt'])) {
+
                         $chaveAcesso = $ar['infProt']->chNFe;
                         $dataRecebe =  $ar['infProt']->dhRecbto;
                     }
                     if (isset($ar['infNFe'])) {
+
                         $valor = $ar['infNFe']->total->ICMSTot->vNF;
                         $mod = $ar['infNFe']->ide->mod;
                         $dataEmissao = $ar['infNFe']->ide->dhEmi;
@@ -312,15 +317,18 @@ class UploadRepositorio
                 ];
             }
         }
-
-        $arr = (array) $report;
-        $uni = array_unique($arr, SORT_REGULAR);
-        $pdf = Pdf::setPaper('a4')->loadView('pdf', ['report' => $uni, 'nome_mercado' => $nomeMercado, 'pasta' => $pasta]);
-        $pdf->save($pdfFilesPath . "//relatorio-sinc-$pasta-$nomeMercado.pdf");
-        echo $pasta . " gerado pdf \n";
-        echo $pasta . " qtd de arquvios " . count($uni) . " \n";
-        $this->gerarZip($pasta, $cnpj, $nomeMercado);
-        return true;
+        if(!empty($nomeMercado)){
+            echo "$pasta $nomeMercado \n";
+            $arr = (array) $report;
+            $uni = array_unique($arr, SORT_REGULAR);
+            $pdf = Pdf::setPaper('a4')->loadView('pdf', ['report' => $uni, 'nome_mercado' => $nomeMercado, 'pasta' => $pasta]);
+            $pdf->save($pdfFilesPath . "//relatorio-sinc-$pasta-$nomeMercado.pdf");
+            echo $pasta . " gerado pdf \n";
+            echo $pasta . " qtd de arquvios " . count($uni) . " \n";
+            $this->gerarZip($pasta, $cnpj, $nomeMercado);
+            return true;
+        }
+        return false;
     }
 
     public function getNameZips($parte = '', $patch = false, $name = false)
