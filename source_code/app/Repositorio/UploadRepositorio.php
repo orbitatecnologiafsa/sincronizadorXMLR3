@@ -20,7 +20,7 @@ class UploadRepositorio
 {
     protected $url = "http://192.168.0.103:9090/api/";
     protected $certificado = "app/cacert.pem";
-   // protected $dirSaveZip = '//home//pingo//Documentos//sincZipXML';
+    // protected $dirSaveZip = '//home//pingo//Documentos//sincZipXML';
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
     //protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe//NFCe";
     protected $dirSaveZip = 'C:\\Orbita\\sincZipXML';
@@ -40,7 +40,7 @@ class UploadRepositorio
 
             $cnpj = $this->getCNPJ();
             if (empty($cnpj)) {
-                var_dump(['error' => 'cnpj não encontrado']);
+               throw new Exception('cnpj não encontrado');
                 die();
             }
 
@@ -86,7 +86,7 @@ class UploadRepositorio
             }
         } catch (Exception $e) {
             // Lidar com erros de solicitação
-            var_dump($e->getMessage());
+            var_dump(['error' => $e->getMessage()]);
 
             // ...
             // Retorne uma resposta de erro adequada para o cliente
@@ -96,60 +96,69 @@ class UploadRepositorio
 
     public function pastasNomeGenerate()
     {
-        date_default_timezone_set('America/Sao_Paulo');
-        $intMes = date('m'); //05
-        $ano = date('Y');
-        if ($intMes == 1) {
-            $intAno = intval(date('Y'));
-            $ano = strval($intAno - 1);
-            $array = [
-                "mes1" => $ano . '10',
-                "mes2" => $ano . '11',
-                "mes3" => $ano . '12',
-            ];
-        } else if ($intMes == 2) {
-            $intAno = intval(date('Y'));
-            $ano = strval($intAno - 1);
-            $array = [
-                "mes1" => $ano . '11',
-                "mes2" => $ano . '12',
-            ];
+        try {
+            date_default_timezone_set('America/Sao_Paulo');
+            $intMes = date('m'); //05
             $ano = date('Y');
-            $array["mes3"] = $ano . '01';
-        } else if ($intMes == 3) {
-            $intAno = intval(date('Y'));
-            $ano = strval($intAno - 1);
-            $array = [
-                "mes1" => $ano . '12',
-            ];
-            $ano = date('Y');
-            $array["mes2"] = $ano . '01';
-            $array["mes3"] = $ano . '02';
-        } else {
+            if ($intMes == 1) {
+                $intAno = intval(date('Y'));
+                $ano = strval($intAno - 1);
+                $array = [
+                    "mes1" => $ano . '10',
+                    "mes2" => $ano . '11',
+                    "mes3" => $ano . '12',
+                ];
+            } else if ($intMes == 2) {
+                $intAno = intval(date('Y'));
+                $ano = strval($intAno - 1);
+                $array = [
+                    "mes1" => $ano . '11',
+                    "mes2" => $ano . '12',
+                ];
+                $ano = date('Y');
+                $array["mes3"] = $ano . '01';
+            } else if ($intMes == 3) {
+                $intAno = intval(date('Y'));
+                $ano = strval($intAno - 1);
+                $array = [
+                    "mes1" => $ano . '12',
+                ];
+                $ano = date('Y');
+                $array["mes2"] = $ano . '01';
+                $array["mes3"] = $ano . '02';
+            } else {
 
-            $mes1 = $this->validarMes(strval($intMes - 1));
-            $mes2 = $this->validarMes(strval($intMes - 2));
-            $mes3 = $this->validarMes(strval($intMes - 3));
-            $ano = date('Y');
+                $mes1 = $this->validarMes(strval($intMes - 1));
+                $mes2 = $this->validarMes(strval($intMes - 2));
+                $mes3 = $this->validarMes(strval($intMes - 3));
+                $ano = date('Y');
 
-            $array = [
-                "mes1" => $ano . $mes1,
-                "mes2" => $ano . $mes2,
-                "mes3" => $ano . $mes3,
-            ];
+                $array = [
+                    "mes1" => $ano . $mes1,
+                    "mes2" => $ano . $mes2,
+                    "mes3" => $ano . $mes3,
+                ];
+            }
+
+
+            return $array;
+        } catch (Exception $e) {
+            // Lidar com erros de solicitação
+            var_dump(['error' => $e->getMessage()]);
         }
-
-
-        return $array;
     }
 
     public function validarMes($mes)
     {
-
-        if (intval($mes) <= 9) {
-            return ('0' .  strval($mes));
+        try {
+            if (intval($mes) <= 9) {
+                return ('0' .  strval($mes));
+            }
+            return $mes;
+        } catch (Exception $e) {
+            // Lidar com erros de solicitação
+            var_dump(['error' => $e->getMessage()]);
         }
-        return $mes;
     }
 
     public function autenticar()
@@ -182,232 +191,242 @@ class UploadRepositorio
 
     public function getCNPJ()
     {
-
-        $cnpj = DB::select('select "CNPJ" as cnpj from "C000004" limit 1');
-        if (!empty($cnpj)) {
-            return HelperUtil::removerMascara($cnpj[0]->cnpj);
+        try {
+            $cnpj = DB::select('select "CNPJ" as cnpj from "C000004" limit 1');
+            if (!empty($cnpj)) {
+                return HelperUtil::removerMascara($cnpj[0]->cnpj);
+            }
+            return '';
+        } catch (Exception $e) {
         }
-        return '';
     }
 
     public function gerarZipComRelatorio()
     {
 
+        try {
+            $nomepasta = ($this->pastasNomeGenerate());
+            $cnpj = $this->getCNPJ();
+            if (empty($cnpj)) {
+                var_dump(['error' => 'cnpj não encontrado']);
+                die();
+            }
+            foreach ($nomepasta as $key => $value) {
+                $diretorio = ($this->diretorio . '//' . $value) . "//";
 
-        //var_dump($this->validZip(''));die();
-        $nomepasta = ($this->pastasNomeGenerate());
-        $cnpj = $this->getCNPJ();
-        if (empty($cnpj)) {
-            var_dump(['error' => 'cnpj não encontrado']);
+                if (($diretorio)) {
+                    throw new Exception('Dir não encontrado');
+                } else if (File::exists($diretorio)) {
+                    //gerar relatorio
+                    $this->gearRelatorio($value, $cnpj, $diretorio);
+                }
+            }
+        } catch (Exception $e) {
+            var_dump(['error' => $e->getMessage()]);
             die();
         }
-        foreach ($nomepasta as $key => $value) {
-            $diretorio = ($this->diretorio . '//' . $value) . "//";
-            if (File::exists($diretorio)) {
-                //gerar relatorio
-                // var_dump($diretorio);die();
-                $this->gearRelatorio($value, $cnpj, $diretorio);
-            }
-        }
+        //var_dump($this->validZip(''));die();
+
     }
 
     public function gerarZip($pasta, $cnpj, $nomeMercado = '-')
     {
-
-        $namePastZip = $this->dirSaveZip;
-        if (!File::exists(($namePastZip))) {
-            $dirPas_um = ($namePastZip);
-            echo " criando pasta em $namePastZip \n";
-            File::makeDirectory($dirPas_um, 0755);
-        }
-
-        //    if (!file_exists("$namePastZip/$cnpj-$pasta-$nomeMercado.zip")) {
-        $directory = $this->diretorio . "//$pasta"; // Insira o caminho para o diretório que contém os arquivos que deseja compactar
-        $zipFile = ("$namePastZip//$pasta-$cnpj-$nomeMercado.zip"); // Caminho para salvar o arquivo RAR
-
-        $zip = new ZipArchive();
-        $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $name => $file) {
-            if (!$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($directory) + 1);
-                $zip->addFile($filePath, $relativePath);
+        try {
+            $namePastZip = $this->dirSaveZip;
+            if (!File::exists(($namePastZip))) {
+                $dirPas_um = ($namePastZip);
+                echo " criando pasta em $namePastZip \n";
+                File::makeDirectory($dirPas_um, 0755);
             }
+
+            //    if (!file_exists("$namePastZip/$cnpj-$pasta-$nomeMercado.zip")) {
+            $directory = $this->diretorio . "//$pasta"; // Insira o caminho para o diretório que contém os arquivos que deseja compactar
+            $zipFile = ("$namePastZip//$pasta-$cnpj-$nomeMercado.zip"); // Caminho para salvar o arquivo RAR
+
+            $zip = new ZipArchive();
+            $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($directory),
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+
+            foreach ($files as $name => $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($directory) + 1);
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+
+            $zip->close();
+
+            $zipFilePath = ("$namePastZip//$pasta-$cnpj-$nomeMercado.zip"); // Caminho completo para o arquivo zip dentro da pasta "public"
+            echo " salvando zip no caminho $zipFilePath\n";
+            // Verifica se o arquivo zip existe
+            if (file_exists($zipFilePath)) {
+                // Gera o URL para o arquivo zip usando a função asset()
+                echo "$pasta zip gerado\n";
+                return true;
+            }
+
+            // Se o arquivo zip não existir, retorne uma mensagem de erro
+            echo "$pasta zip error ao gerar\n";
+            return false;
+            //code...
+        } catch (Exception $e) {
+            // Lidar com erros de solicitação
+            var_dump(['error' => $e->getMessage()]);
         }
 
-        $zip->close();
-
-        $zipFilePath = ("$namePastZip//$pasta-$cnpj-$nomeMercado.zip"); // Caminho completo para o arquivo zip dentro da pasta "public"
-        echo " salvando zip no caminho $zipFilePath\n";
-        // Verifica se o arquivo zip existe
-        if (file_exists($zipFilePath)) {
-            // Gera o URL para o arquivo zip usando a função asset()
-            echo "$pasta zip gerado\n";
-            return true;
-        }
-
-        // Se o arquivo zip não existir, retorne uma mensagem de erro
-        echo "$pasta zip error ao gerar\n";
-        return false;
         //  }
         //return false;
     }
 
     public function gearRelatorio($pasta, $cnpj, $diretorio)
     {
-        $report = [];
-        $valor = '';
-        $chaveAcesso = '';
-        $mod = '';
-        $dataEmissao = '';
-        $dataRecebe = '';
-        $serie = '';
-        $numNota = '';
-        $cfop = '';
-        $sit = '';
-        $valide = false;
-        $nomeMercado = '';
-        $xmlFilesPath = $diretorio;
-        $pdfFilesPath = $diretorio;
-        $xmlFiles = File::files($xmlFilesPath);
+        try {
+            //code...
+            $report = [];
+            $valor = '';
+            $chaveAcesso = '';
+            $mod = '';
+            $dataEmissao = '';
+            $dataRecebe = '';
+            $serie = '';
+            $numNota = '';
+            $cfop = '';
+            $sit = '';
+            $valide = false;
+            $nomeMercado = '';
+            $xmlFilesPath = $diretorio;
+            $pdfFilesPath = $diretorio;
+            $xmlFiles = File::files($xmlFilesPath);
 
-        foreach ($xmlFiles as $xmlFile) {
-            libxml_use_internal_errors(TRUE);
-            if ($xmlFile->getExtension() != 'pdf') {
-                $xmlContent = file_get_contents($xmlFile->getPathname());
-                $xml =  (array) simplexml_load_string($xmlContent, 'SimpleXMLElement', LIBXML_NOCDATA);
+            foreach ($xmlFiles as $xmlFile) {
+                libxml_use_internal_errors(TRUE);
+                if ($xmlFile->getExtension() != 'pdf') {
+                    $xmlContent = file_get_contents($xmlFile->getPathname());
+                    $xml =  (array) simplexml_load_string($xmlContent, 'SimpleXMLElement', LIBXML_NOCDATA);
 
-                foreach ($xml as $key => $v) {
-                    $ar = (array) $v;
+                    foreach ($xml as $key => $v) {
+                        $ar = (array) $v;
 
-                    echo "lendo arq. pasta $pasta\n";
-                    switch ($ar) {
-                        case isset($ar['infProt']):
-                            $chaveAcesso = $ar['infProt']->chNFe;
-                            $dataRecebe =  $ar['infProt']->dhRecbto;
-                            $valide = true;
-                            break;
-                        case isset($ar['infNFe']):
-                            $valor = $ar['infNFe']->total->ICMSTot->vNF;
-                            $mod = $ar['infNFe']->ide->mod;
-                            $dataEmissao = $ar['infNFe']->ide->dhEmi;
-                            $serie = $ar['infNFe']->ide->serie;
-                            $numNota = $ar['infNFe']->ide->nNF;
-                            $cfop = $ar['infNFe']->det->prod->CFOP;
-                            $sit = $ar['infNFe']->ide->procEmi;
-                            $nomeMercado = $ar['infNFe']->emit->xFant;
-                            break;
-                        default:
-                            # code...
-                            break;
+                        echo "lendo arq. pasta $pasta\n";
+                        switch ($ar) {
+                            case isset($ar['infProt']):
+                                $chaveAcesso = $ar['infProt']->chNFe;
+                                $dataRecebe =  $ar['infProt']->dhRecbto;
+                                $valide = true;
+                                break;
+                            case isset($ar['infNFe']):
+                                $valor = $ar['infNFe']->total->ICMSTot->vNF;
+                                $mod = $ar['infNFe']->ide->mod;
+                                $dataEmissao = $ar['infNFe']->ide->dhEmi;
+                                $serie = $ar['infNFe']->ide->serie;
+                                $numNota = $ar['infNFe']->ide->nNF;
+                                $cfop = $ar['infNFe']->det->prod->CFOP;
+                                $sit = $ar['infNFe']->ide->procEmi;
+                                $nomeMercado = $ar['infNFe']->emit->xFant;
+                                break;
+                            default:
+                                # code...
+                                break;
+                        }
+                        // if (isset($ar['infProt'])) {
+                        //     $chaveAcesso = $ar['infProt']->chNFe;
+                        //     $dataRecebe =  $ar['infProt']->dhRecbto;
+                        // } else {
+                        //     var_dump("nota pra excluir");
+                        //     die();
+                        // }
+                        // if (isset($ar['infNFe'])) {
+
+                        //     $valor = $ar['infNFe']->total->ICMSTot->vNF;
+                        //     $mod = $ar['infNFe']->ide->mod;
+                        //     $dataEmissao = $ar['infNFe']->ide->dhEmi;
+                        //     $serie = $ar['infNFe']->ide->serie;
+                        //     $numNota = $ar['infNFe']->ide->nNF;
+                        //     $cfop = $ar['infNFe']->det->prod->CFOP;
+                        //     $sit = $ar['infNFe']->ide->procEmi;
+                        //     $nomeMercado = $ar['infNFe']->emit->xFant;
+                        // }
                     }
-                    // if (isset($ar['infProt'])) {
-                    //     $chaveAcesso = $ar['infProt']->chNFe;
-                    //     $dataRecebe =  $ar['infProt']->dhRecbto;
-                    // } else {
-                    //     var_dump("nota pra excluir");
-                    //     die();
-                    // }
-                    // if (isset($ar['infNFe'])) {
-
-                    //     $valor = $ar['infNFe']->total->ICMSTot->vNF;
-                    //     $mod = $ar['infNFe']->ide->mod;
-                    //     $dataEmissao = $ar['infNFe']->ide->dhEmi;
-                    //     $serie = $ar['infNFe']->ide->serie;
-                    //     $numNota = $ar['infNFe']->ide->nNF;
-                    //     $cfop = $ar['infNFe']->det->prod->CFOP;
-                    //     $sit = $ar['infNFe']->ide->procEmi;
-                    //     $nomeMercado = $ar['infNFe']->emit->xFant;
-                    // }
-                }
-                if ($valide) {
-                    $report[] = [
-                        'chaveAcesso' => $chaveAcesso,
-                        'valor' => $valor,
-                        'mode' => $mod,
-                        'dataEmissao' => $dataEmissao,
-                        'dataRecebe' => $dataRecebe,
-                        'serie' => $serie,
-                        'numNota' => $numNota,
-                        'cfop' => $cfop,
-                        'sit' => $sit
-                    ];
-                } else {
-                    //   var_dump($xmlFile->getPathname());die();
-                    File::delete($xmlFile->getPathname());
+                    if ($valide) {
+                        $report[] = [
+                            'chaveAcesso' => $chaveAcesso,
+                            'valor' => $valor,
+                            'mode' => $mod,
+                            'dataEmissao' => $dataEmissao,
+                            'dataRecebe' => $dataRecebe,
+                            'serie' => $serie,
+                            'numNota' => $numNota,
+                            'cfop' => $cfop,
+                            'sit' => $sit
+                        ];
+                    } else {
+                        //   var_dump($xmlFile->getPathname());die();
+                        File::delete($xmlFile->getPathname());
+                    }
                 }
             }
-        }
-        if ($valide) {
-            echo "$pasta $nomeMercado \n";
-            //    var_dump($pdfFilesPath . "relatorio-sinc-$pasta-$nomeMercado.pdf");die();
-            $arr = (array) $report;
-            $uni = array_unique($arr, SORT_REGULAR);
-            $pdf = Pdf::setPaper('a4')->loadView('pdf', ['report' => $uni, 'nome_mercado' => $nomeMercado, 'pasta' => $pasta]);
-            $pdf->save($pdfFilesPath . "relatorio-sinc-$pasta-$nomeMercado.pdf");
+            if ($valide) {
+                echo "$pasta $nomeMercado \n";
+                //    var_dump($pdfFilesPath . "relatorio-sinc-$pasta-$nomeMercado.pdf");die();
+                $arr = (array) $report;
+                $uni = array_unique($arr, SORT_REGULAR);
+                $pdf = Pdf::setPaper('a4')->loadView('pdf', ['report' => $uni, 'nome_mercado' => $nomeMercado, 'pasta' => $pasta]);
+                $pdf->save($pdfFilesPath . "relatorio-sinc-$pasta-$nomeMercado.pdf");
 
-            echo $pasta . " gerado pdf \n";
-            echo $pasta . " qtd de arquvios " . count($uni) . " \n";
-            $this->gerarZip($pasta, $cnpj, $nomeMercado);
-            return true;
-        } else {
-            return false;
+                echo $pasta . " gerado pdf \n";
+                echo $pasta . " qtd de arquvios " . count($uni) . " \n";
+                $this->gerarZip($pasta, $cnpj, $nomeMercado);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            // Lidar com erros de solicitação
+            var_dump(['error' => $e->getMessage()]);
         }
     }
 
     public function getNameZips($parte = '', $patch = false, $name = false)
     {
 
-        $storagePath = $this->dirSaveZip;
+        try {
+            $storagePath = $this->dirSaveZip;
 
-        $dirInfo = '';
-        $nameZip = '';
-        // Caminho para o diretório de armazenamento
-        if (File::exists($storagePath)) {
-            $directories = File::files($storagePath);
-            $pastas = [];
-            foreach ($directories as $directory) {
+            $dirInfo = '';
+            $nameZip = '';
+            // Caminho para o diretório de armazenamento
+            if (File::exists($storagePath)) {
+                $directories = File::files($storagePath);
+                $pastas = [];
+                foreach ($directories as $directory) {
 
-                if (pathinfo($directory->getExtension() === 'zip')) {
-                    if (str_contains($directory->getFilename(), $parte)) {
-                        $dirInfo = $directory->getRealPath();
-                        $nameZip = substr($directory->getFilename(), 7);
+                    if (pathinfo($directory->getExtension() === 'zip')) {
+                        if (str_contains($directory->getFilename(), $parte)) {
+                            $dirInfo = $directory->getRealPath();
+                            $nameZip = substr($directory->getFilename(), 7);
+                        }
+
+                        $pastas[] = substr($directory->getFilename(), 0, 6);
                     }
-
-                    $pastas[] = substr($directory->getFilename(), 0, 6);
                 }
-            }
-            if ($patch == true) {
-                return $dirInfo;
-            }
-            if ($name == true) {
+                if ($patch == true) {
+                    return $dirInfo;
+                }
+                if ($name == true) {
 
-                return $nameZip;
+                    return $nameZip;
+                }
+                return $pastas;
             }
-            return $pastas;
+            return [];
+        } catch (Exception $e) {
+            // Lidar com erros de solicitação
+            var_dump(['error' => $e->getMessage()]);
         }
-        return [];
     }
-
-
-    // public function validZip($pasta)
-    // {
-
-    //     $pastas = $this->getNameZips();
-    //     $res = false;
-    //     foreach ($pastas as $p => $v) {
-    //         if ($pasta == $v) {
-    //             $res = true;
-    //         }
-    //         $res = false;
-    //     }
-
-    //     return $res;
-    // }
 }
