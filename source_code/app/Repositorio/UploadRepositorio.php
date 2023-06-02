@@ -214,9 +214,8 @@ class UploadRepositorio
             foreach ($nomepasta as $key => $value) {
                 $diretorio = ($this->diretorio . '//' . $value) . "//";
 
-                if (($diretorio)) {
-                    throw new Exception('Dir não encontrado');
-                } else if (File::exists($diretorio)) {
+
+              if (File::exists($diretorio)) {
                     //gerar relatorio
                     $this->gearRelatorio($value, $cnpj, $diretorio);
                 }
