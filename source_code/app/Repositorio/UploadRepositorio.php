@@ -18,17 +18,18 @@ use Barryvdh\DomPDF\Facade\Pdf as Pdf;
 
 class UploadRepositorio
 {
-    protected $url = "http://127.0.0.1:8000/api/";
+    protected $url = "http://192.168.0.103:9090/api/";
     protected $certificado = "app/cacert.pem";
-    protected $dirSaveZip = '/home/pingo/Documentos/sincZipXML';
+    protected $dirSaveZip = '//home//pingo//Documentos//sincZipXML';
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
-    protected $diretorio = "/home/pingo/Documentos/XML mar 23/Core3/C3 Núcleo/nfe/NFCe";
+    protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe/NFCe";
 
     public function envairXML()
     {
         try {
             $nomepasta = ($this->pastasNomeGenerate());
             $access_token = $this->autenticar();
+            //var_dump($access_token);die();
             $pasta = '';
 
             // if(!File::exists(storage_path($this->diretorio))){
@@ -201,7 +202,7 @@ class UploadRepositorio
             die();
         }
         foreach ($nomepasta as $key => $value) {
-            $diretorio = ($this->diretorio . '/' . $value);
+            $diretorio = ($this->diretorio . '//' . $value);
             if (File::exists($diretorio)) {
                 //gerar relatorio
                 $this->gearRelatorio($value, $cnpj, $diretorio);
@@ -220,8 +221,8 @@ class UploadRepositorio
         }
 
         //    if (!file_exists("$namePastZip/$cnpj-$pasta-$nomeMercado.zip")) {
-        $directory = $this->diretorio . "/$pasta"; // Insira o caminho para o diretório que contém os arquivos que deseja compactar
-        $zipFile = ("$namePastZip/$pasta-$cnpj-$nomeMercado.zip"); // Caminho para salvar o arquivo RAR
+        $directory = $this->diretorio . "//$pasta"; // Insira o caminho para o diretório que contém os arquivos que deseja compactar
+        $zipFile = ("$namePastZip//$pasta-$cnpj-$nomeMercado.zip"); // Caminho para salvar o arquivo RAR
 
         $zip = new ZipArchive();
         $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
@@ -241,7 +242,7 @@ class UploadRepositorio
 
         $zip->close();
 
-        $zipFilePath = ("$namePastZip/$pasta-$cnpj-$nomeMercado.zip"); // Caminho completo para o arquivo zip dentro da pasta "public"
+        $zipFilePath = ("$namePastZip//$pasta-$cnpj-$nomeMercado.zip"); // Caminho completo para o arquivo zip dentro da pasta "public"
         echo " salvando zip no caminho $zipFilePath\n";
         // Verifica se o arquivo zip existe
         if (file_exists($zipFilePath)) {
@@ -315,7 +316,7 @@ class UploadRepositorio
         $arr = (array) $report;
         $uni = array_unique($arr, SORT_REGULAR);
         $pdf = Pdf::setPaper('a4')->loadView('pdf', ['report' => $uni, 'nome_mercado' => $nomeMercado, 'pasta' => $pasta]);
-        $pdf->save($pdfFilesPath . "/relatorio-sinc-$pasta-$nomeMercado.pdf");
+        $pdf->save($pdfFilesPath . "//relatorio-sinc-$pasta-$nomeMercado.pdf");
         echo $pasta . " gerado pdf \n";
         echo $pasta . " qtd de arquvios " . count($uni) . " \n";
         $this->gerarZip($pasta, $cnpj, $nomeMercado);
