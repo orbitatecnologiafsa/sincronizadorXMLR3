@@ -22,7 +22,7 @@ class UploadRepositorio
     protected $certificado = "app/cacert.pem";
     protected $dirSaveZip = '//home//pingo//Documentos//sincZipXML';
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
-    protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe/NFCe";
+    protected $diretorio = "//home//pingo//Documentos//XML mar 23//Core3//C3 Núcleo//nfe//NFCe";
 
     public function envairXML()
     {
@@ -47,7 +47,7 @@ class UploadRepositorio
                 $dirZip = $this->getNameZips($value, true);
                 if (File::exists($dirZip)) {
                     echo "$value zip enviando\n";
-                    $name = $value ."-" .$this->getNameZips('',false,true) ;
+                    $name = $value . "-" . $this->getNameZips('', false, true);
 
                     $cliente = new Client([
                         'verify' => storage_path($this->certificado), // Caminho completo para o arquivo cacert.pem
@@ -77,12 +77,10 @@ class UploadRepositorio
 
                     // Faça o que desejar com a resposta da API
                     // ...
-                     File::delete($dirZip);
+                    // File::delete($dirZip);
                     // Retorne uma resposta adequada para o cliente
                     var_dump(['message' => 'Arquivos enviados com sucesso', "resposta" => $responseData], 200);
                 }
-
-
             }
         } catch (Exception $e) {
             // Lidar com erros de solicitação
@@ -202,9 +200,10 @@ class UploadRepositorio
             die();
         }
         foreach ($nomepasta as $key => $value) {
-            $diretorio = ($this->diretorio . '//' . $value);
+            $diretorio = ($this->diretorio . '//' . $value). "//";
             if (File::exists($diretorio)) {
                 //gerar relatorio
+               // var_dump($diretorio);die();
                 $this->gearRelatorio($value, $cnpj, $diretorio);
             }
         }
@@ -270,6 +269,7 @@ class UploadRepositorio
         $numNota = '';
         $cfop = '';
         $sit = '';
+        $valide = false;
         $nomeMercado = '';
         $xmlFilesPath = $diretorio;
         $pdfFilesPath = $diretorio;
@@ -285,50 +285,79 @@ class UploadRepositorio
                     $ar = (array) $v;
 
                     echo "lendo arq. pasta $pasta\n";
-
-                    if (isset($ar['infProt'])) {
-
-                        $chaveAcesso = $ar['infProt']->chNFe;
-                        $dataRecebe =  $ar['infProt']->dhRecbto;
+                    switch ($ar) {
+                        case isset($ar['infProt']):
+                            $chaveAcesso = $ar['infProt']->chNFe;
+                            $dataRecebe =  $ar['infProt']->dhRecbto;
+                            $valide = true;
+                            break;
+                        case isset($ar['infNFe']):
+                            $valor = $ar['infNFe']->total->ICMSTot->vNF;
+                            $mod = $ar['infNFe']->ide->mod;
+                            $dataEmissao = $ar['infNFe']->ide->dhEmi;
+                            $serie = $ar['infNFe']->ide->serie;
+                            $numNota = $ar['infNFe']->ide->nNF;
+                            $cfop = $ar['infNFe']->det->prod->CFOP;
+                            $sit = $ar['infNFe']->ide->procEmi;
+                            $nomeMercado = $ar['infNFe']->emit->xFant;
+                            break;
+                        default:
+                            # code...
+                            break;
                     }
-                    if (isset($ar['infNFe'])) {
+                    // if (isset($ar['infProt'])) {
+                    //     $chaveAcesso = $ar['infProt']->chNFe;
+                    //     $dataRecebe =  $ar['infProt']->dhRecbto;
+                    // } else {
+                    //     var_dump("nota pra excluir");
+                    //     die();
+                    // }
+                    // if (isset($ar['infNFe'])) {
 
-                        $valor = $ar['infNFe']->total->ICMSTot->vNF;
-                        $mod = $ar['infNFe']->ide->mod;
-                        $dataEmissao = $ar['infNFe']->ide->dhEmi;
-                        $serie = $ar['infNFe']->ide->serie;
-                        $numNota = $ar['infNFe']->ide->nNF;
-                        $cfop = $ar['infNFe']->det->prod->CFOP;
-                        $sit = $ar['infNFe']->ide->procEmi;
-                        $nomeMercado = $ar['infNFe']->emit->xFant;
-                    }
+                    //     $valor = $ar['infNFe']->total->ICMSTot->vNF;
+                    //     $mod = $ar['infNFe']->ide->mod;
+                    //     $dataEmissao = $ar['infNFe']->ide->dhEmi;
+                    //     $serie = $ar['infNFe']->ide->serie;
+                    //     $numNota = $ar['infNFe']->ide->nNF;
+                    //     $cfop = $ar['infNFe']->det->prod->CFOP;
+                    //     $sit = $ar['infNFe']->ide->procEmi;
+                    //     $nomeMercado = $ar['infNFe']->emit->xFant;
+                    // }
                 }
-
-                $report[] = [
-                    'chaveAcesso' => $chaveAcesso,
-                    'valor' => $valor,
-                    'mode' => $mod,
-                    'dataEmissao' => $dataEmissao,
-                    'dataRecebe' => $dataRecebe,
-                    'serie' => $serie,
-                    'numNota' => $numNota,
-                    'cfop' => $cfop,
-                    'sit' => $sit
-                ];
+                if ($valide) {
+                    $report[] = [
+                        'chaveAcesso' => $chaveAcesso,
+                        'valor' => $valor,
+                        'mode' => $mod,
+                        'dataEmissao' => $dataEmissao,
+                        'dataRecebe' => $dataRecebe,
+                        'serie' => $serie,
+                        'numNota' => $numNota,
+                        'cfop' => $cfop,
+                        'sit' => $sit
+                    ];
+                }else{
+                 //   var_dump($xmlFile->getPathname());die();
+                    File::delete($xmlFile->getPathname());
+                }
             }
         }
-        if(!empty($nomeMercado)){
+        if($valide){
             echo "$pasta $nomeMercado \n";
+        //    var_dump($pdfFilesPath . "relatorio-sinc-$pasta-$nomeMercado.pdf");die();
             $arr = (array) $report;
             $uni = array_unique($arr, SORT_REGULAR);
             $pdf = Pdf::setPaper('a4')->loadView('pdf', ['report' => $uni, 'nome_mercado' => $nomeMercado, 'pasta' => $pasta]);
-            $pdf->save($pdfFilesPath . "//relatorio-sinc-$pasta-$nomeMercado.pdf");
+            $pdf->save($pdfFilesPath . "relatorio-sinc-$pasta-$nomeMercado.pdf");
+
             echo $pasta . " gerado pdf \n";
             echo $pasta . " qtd de arquvios " . count($uni) . " \n";
             $this->gerarZip($pasta, $cnpj, $nomeMercado);
             return true;
+        }else{
+            return false;
         }
-        return false;
+
     }
 
     public function getNameZips($parte = '', $patch = false, $name = false)
@@ -356,7 +385,7 @@ class UploadRepositorio
             if ($patch == true) {
                 return $dirInfo;
             }
-             if($name == true){
+            if ($name == true) {
 
                 return $nameZip;
             }
