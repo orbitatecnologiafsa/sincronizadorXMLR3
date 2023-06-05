@@ -18,7 +18,7 @@ use Barryvdh\DomPDF\Facade\Pdf as Pdf;
 
 class UploadRepositorio
 {
-    protected $url = "http://192.168.0.103:9090/api/";
+    protected $url = "https://orbitaxml.azurewebsites.net/api/";
     protected $certificado = "app/cacert.pem";
     // protected $dirSaveZip = '//home//pingo//Documentos//sincZipXML';
     // protected $diretorio = "C:\Orbita\R3 Núcleo\nfe";
