@@ -31,14 +31,26 @@ class upload extends Command
 
         date_default_timezone_set('America/Sao_Paulo');
         $hora_init = date('H:i:s');
-        $upload  = new ModelsUpload();
-        $upload->gerarZipRelatorio();
-        $upload->cadastarXML();
-        $hora_final =  date('H:i:s');
-        echo "Serviço  finalizado! \n time init {$hora_init}  time final {$hora_final} \n";
-
+        if ($this->verficarInternet()) {
+            $upload  = new ModelsUpload();
+            $upload->gerarZipRelatorio();
+            $upload->cadastarXML();
+            $hora_final =  date('H:i:s');
+            echo "Serviço  finalizado! \n time init {$hora_init}  time final {$hora_final} \n";
+        }else{
+            var_dump(['error' => 'sem conexão com a internet']);
+        }
     }
 
 
-
+    public function verficarInternet()
+    {
+        $url = 'http://www.google.com';
+        $headers = @get_headers($url);
+        if ($headers && strpos($headers[0], '200')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
