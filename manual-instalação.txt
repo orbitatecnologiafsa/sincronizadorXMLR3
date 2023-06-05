@@ -1,0 +1,45 @@
+
+
+
+
+
+Para fazer a instalação
+
+   Da pasta Download ou de onde voçe deixou salvo o sincronizadorXMLR3-main
+   Abra o sincronizador-main
+   Copie o sincronizador-main
+   Cole na pasta  caminho "C:\Orbita"
+   Renomei o incronizadorXMLR3-main para sincronizadorXML
+
+Instalando dependencias do sincronizador
+
+   Navegue ate a pasta raiz do sincronizador execute como administrador o INSTALLDEPENDENCIA.bat
+   Aguarde a finalização
+
+Testando  com o debug
+
+  Navegue ate a pasta raiz do sincronizador
+  Execute como administrador o DEBUG.bat
+  E Aguarde finalizar
+  Se tiver erros entre em contato com o suporte!
+
+Iniciando serviço 
+
+  Navegue atá a pasta raiz do sincronizador
+  Execute como administrador INITSYSTEM.bat
+  Aguarde finalizar!
+  Reinicie o compudator
+  O serviço vai ser levantado e vai subir os registros para a nuvem
+
+Instalando dependencias do windows caso necessario!
+   Se caso os passos acima tenha dado erros de dll faltando,
+   Siga esses passos abaixo e tente novamente!
+   Navegue até a pasta DllWindowsResolver,
+   Execute o VisualCpp
+   Ele é responsavel por instalar dlls que talvez os clientes não tenham instalado na maquina
+   Aguarde finalizar
+   E refaça os seguintes passos:
+       Instalando dependencias do sincronizador
+       Testando  com o debug
+
+
