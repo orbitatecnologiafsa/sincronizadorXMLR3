@@ -1,3 +1,3 @@
-# sincronizador
+
 
 # sincronizadorXMLR3
